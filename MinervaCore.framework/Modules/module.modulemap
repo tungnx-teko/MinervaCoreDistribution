@@ -1,0 +1,11 @@
+framework module MinervaCore {
+  umbrella header "MinervaCore.h"
+
+  export *
+  module * { export * }
+}
+
+module MinervaCore.Swift {
+    header "MinervaCore-Swift.h"
+    requires objc
+}
