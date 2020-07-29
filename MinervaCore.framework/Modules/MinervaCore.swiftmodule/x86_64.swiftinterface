@@ -1,0 +1,265 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 5.2.4 effective-4.1.50 (swiftlang-1103.0.32.9 clang-1103.0.32.53)
+// swift-module-flags: -target x86_64-apple-ios10.0-simulator -enable-objc-interop -enable-library-evolution -swift-version 4 -enforce-exclusivity=checked -O -module-name MinervaCore
+import CommonCrypto/*.CC_LONG*/
+import CommonCrypto/*.CC_MD5*/
+import CommonCrypto/*.CC_MD5_DIGEST_LENGTH*/
+import FirebaseCore
+import FirebaseFirestore
+import Foundation
+@_exported import MinervaCore
+import Swift
+public protocol BasePaymentRequest {
+  var orderId: Swift.String { get }
+  var orderCode: Swift.String { get }
+  var orderDescription: Swift.String { get }
+  var amount: Swift.Double { get }
+  var cancelUrl: Swift.String { get }
+  var returnUrl: Swift.String { get }
+}
+public class PaymentRequest {
+  public var orderId: Swift.String
+  public var orderCode: Swift.String
+  public var amount: Swift.Double
+  public var orderDescription: Swift.String
+  public var expireTime: Swift.Int
+  public init(orderId: Swift.String, orderCode: Swift.String, orderDescription: Swift.String = "", amount: Swift.Double, expireTime: Swift.Int = 600)
+  @objc deinit
+}
+public class MinervaGatewayConfig {
+  final public let clientCode: Swift.String
+  final public let terminalCode: Swift.String
+  final public let serviceCode: Swift.String
+  final public let secretKey: Swift.String
+  final public let baseUrl: Swift.String
+  public init(clientCode: Swift.String, terminalCode: Swift.String, serviceCode: Swift.String, secretKey: Swift.String, baseUrl: Swift.String)
+  @objc deinit
+}
+public typealias Parameters = [Swift.String : Any]
+public protocol ParameterEncoder {
+  func encode(urlRequest: inout Foundation.URLRequest, with parameters: MinervaCore.Parameters) throws
+}
+public enum ParameterEncoding {
+  case urlEncoding
+  case jsonEncoding
+  public func encode(urlRequest: inout Foundation.URLRequest, bodyParameters: MinervaCore.Parameters?, urlParameters: MinervaCore.Parameters?) throws
+  public static func == (a: MinervaCore.ParameterEncoding, b: MinervaCore.ParameterEncoding) -> Swift.Bool
+  public var hashValue: Swift.Int {
+    get
+  }
+  public func hash(into hasher: inout Swift.Hasher)
+}
+public struct JSONParameterEncoder : MinervaCore.ParameterEncoder {
+  public func encode(urlRequest: inout Foundation.URLRequest, with parameters: MinervaCore.Parameters) throws
+}
+extension NSDictionary {
+  public func _bridgeToSwift() -> [ObjectiveC.NSObject : Swift.AnyObject]
+}
+public enum HTTPMethod : Swift.String {
+  case get
+  case post
+  case put
+  case patch
+  case delete
+  public typealias RawValue = Swift.String
+  public init?(rawValue: Swift.String)
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public enum Environment {
+  case development
+  case production
+  public static func == (a: MinervaCore.Environment, b: MinervaCore.Environment) -> Swift.Bool
+  public var hashValue: Swift.Int {
+    get
+  }
+  public func hash(into hasher: inout Swift.Hasher)
+}
+public typealias HTTPHeaders = [Swift.String : Swift.String]
+public enum HTTPTask {
+  case request
+  case requestParametersAndHeaders(bodyParameters: MinervaCore.Parameters?, bodyEncoding: MinervaCore.ParameterEncoding, urlParameters: MinervaCore.Parameters?, additionHeaders: MinervaCore.HTTPHeaders?)
+}
+public enum Result<T, V> {
+  case success(T)
+  case failure(V)
+}
+public class QRPaymentRequest : MinervaCore.BasePaymentRequest {
+  public var orderId: Swift.String
+  public var orderCode: Swift.String
+  public var orderDescription: Swift.String
+  public var amount: Swift.Double
+  public var cancelUrl: Swift.String
+  public var returnUrl: Swift.String
+  public init(orderId: Swift.String, orderCode: Swift.String, amount: Swift.Double, orderDescription: Swift.String = "", cancelUrl: Swift.String = "", returnUrl: Swift.String = "")
+  @objc deinit
+}
+public protocol Transaction {
+  var code: Swift.String { get }
+}
+public class QRTransaction : MinervaCore.Transaction, Swift.Codable {
+  public var code: Swift.String
+  public var qrContent: Swift.String
+  public init(code: Swift.String, qrContent: Swift.String)
+  @objc deinit
+  required public init(from decoder: Swift.Decoder) throws
+  public func encode(to encoder: Swift.Encoder) throws
+}
+public class SPOSTransaction : MinervaCore.Transaction, Swift.Codable {
+  public var code: Swift.String
+  public var merchantPartnerCode: Swift.String
+  public init(code: Swift.String, merchantPartnerCode: Swift.String)
+  @objc deinit
+  required public init(from decoder: Swift.Decoder) throws
+  public func encode(to encoder: Swift.Encoder) throws
+}
+public enum MinervaError : Swift.Error {
+  case missingConfig
+  case missingPaymentConfig
+  case paymentConfigNotMatchMethod
+  case timeOut
+  case service(MinervaCore.PaymentError)
+  case undefined(message: Swift.String)
+}
+public class PaymentObserver {
+  public init()
+  public func observe(transactionCode: Swift.String, completion: @escaping (MinervaCore.Result<MinervaCore.PaymentTransactionResult, MinervaCore.MinervaError>) -> ())
+  @objc deinit
+}
+public struct PaymentTransactionResult {
+  public var amount: Swift.Double?
+  public var message: Swift.String?
+  public var ref: Swift.String?
+  public var status: Swift.String?
+  public var transactionId: Swift.String?
+  public var isSuccess: Swift.Bool {
+    get
+  }
+  public init(fromDict dict: [Swift.String : Any])
+}
+public enum PaymentError : Swift.Int {
+  case common
+  case processing
+  case paymentProcessed
+  case balanceNotEnough
+  case paymentCancelled
+  case paymentMethodNotSupported
+  case outOfStock
+  public init(code: Swift.Int)
+  public var message: Swift.String {
+    get
+  }
+  public typealias RawValue = Swift.Int
+  public init?(rawValue: Swift.Int)
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public protocol EndPointType {
+  var baseURL: Foundation.URL { get }
+  var path: Swift.String { get }
+  var httpMethod: MinervaCore.HTTPMethod { get }
+  var task: MinervaCore.HTTPTask { get }
+  var headers: MinervaCore.HTTPHeaders? { get }
+}
+public class SPOSPaymentRequest : MinervaCore.BasePaymentRequest {
+  final public let orderId: Swift.String
+  final public let orderCode: Swift.String
+  final public let orderDescription: Swift.String
+  final public let amount: Swift.Double
+  public var partnerCode: Swift.String
+  public var cancelUrl: Swift.String
+  public var returnUrl: Swift.String
+  public init(orderId: Swift.String, orderCode: Swift.String, orderDescription: Swift.String = "", amount: Swift.Double, cancelUrl: Swift.String = "", returnUrl: Swift.String = "")
+  @objc deinit
+}
+public typealias NetworkRouterCompletion<T> = (T?, MinervaCore.NetworkError?) -> ()
+public protocol NetworkRouter : AnyObject {
+  associatedtype EndPoint : MinervaCore.EndPointType
+  func request<T>(_ route: Self.EndPoint, responseType: T.Type, completion: @escaping MinervaCore.NetworkRouterCompletion<T>) where T : Swift.Decodable
+  func cancel()
+}
+public enum NetworkError : Swift.String, Swift.Error {
+  case authenticationError
+  case badRequest
+  case outdated
+  case failed
+  case noData
+  case unableToDecode
+  case undefined
+  case encodingFailed
+  case missingURL
+  public typealias RawValue = Swift.String
+  public init?(rawValue: Swift.String)
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public class Router<EndPoint> : MinervaCore.NetworkRouter where EndPoint : MinervaCore.EndPointType {
+  public init()
+  public func request<T>(_ route: EndPoint, responseType: T.Type, completion: @escaping MinervaCore.NetworkRouterCompletion<T>) where T : Swift.Decodable
+  public func cancel()
+  @objc deinit
+}
+public enum PaymentMethod {
+  case spos
+  case qr
+  public var methodCode: Swift.String {
+    get
+  }
+  public var partnerCode: Swift.String {
+    get
+  }
+  public var bankCode: Swift.String {
+    get
+  }
+  public static func == (a: MinervaCore.PaymentMethod, b: MinervaCore.PaymentMethod) -> Swift.Bool
+  public var hashValue: Swift.Int {
+    get
+  }
+  public func hash(into hasher: inout Swift.Hasher)
+}
+public protocol BasePaymentConfig {
+  var partnerCode: Swift.String { get }
+}
+public class QRPaymentConfig : MinervaCore.BasePaymentConfig {
+  public var partnerCode: Swift.String
+  public init(partnerCode: Swift.String)
+  @objc deinit
+}
+public class SPOSPaymentConfig : MinervaCore.BasePaymentConfig {
+  public var partnerCode: Swift.String
+  public init(partnerCode: Swift.String)
+  @objc deinit
+}
+public struct URLParameterEncoder : MinervaCore.ParameterEncoder {
+  public func encode(urlRequest: inout Foundation.URLRequest, with parameters: MinervaCore.Parameters) throws
+}
+public protocol GatewayProtocol {
+  func pay(method: MinervaCore.PaymentMethod, request: MinervaCore.BasePaymentRequest, completion: @escaping (MinervaCore.Result<MinervaCore.Transaction, MinervaCore.MinervaError>) -> ()) throws
+}
+@_hasMissingDesignatedInitializers public class MinervaGateway : MinervaCore.GatewayProtocol {
+  public static let shared: MinervaCore.MinervaGateway
+  public class func setUp(_ config: MinervaCore.MinervaGatewayConfig, environment: MinervaCore.Environment)
+  public func pay(method: MinervaCore.PaymentMethod, request: MinervaCore.BasePaymentRequest, completion: @escaping (MinervaCore.Result<MinervaCore.Transaction, MinervaCore.MinervaError>) -> ()) throws
+  public static func addConfig(_ config: MinervaCore.BasePaymentConfig, forMethod method: MinervaCore.PaymentMethod) throws
+  public static func getConfig(forMethod method: MinervaCore.PaymentMethod) -> MinervaCore.BasePaymentConfig?
+  public static func addPaymentMethods(_ methods: [MinervaCore.PaymentMethod])
+  @objc deinit
+}
+extension MinervaCore.ParameterEncoding : Swift.Equatable {}
+extension MinervaCore.ParameterEncoding : Swift.Hashable {}
+extension MinervaCore.HTTPMethod : Swift.Equatable {}
+extension MinervaCore.HTTPMethod : Swift.Hashable {}
+extension MinervaCore.HTTPMethod : Swift.RawRepresentable {}
+extension MinervaCore.Environment : Swift.Equatable {}
+extension MinervaCore.Environment : Swift.Hashable {}
+extension MinervaCore.PaymentError : Swift.Equatable {}
+extension MinervaCore.PaymentError : Swift.Hashable {}
+extension MinervaCore.PaymentError : Swift.RawRepresentable {}
+extension MinervaCore.NetworkError : Swift.Equatable {}
+extension MinervaCore.NetworkError : Swift.Hashable {}
+extension MinervaCore.NetworkError : Swift.RawRepresentable {}
+extension MinervaCore.PaymentMethod : Swift.Equatable {}
+extension MinervaCore.PaymentMethod : Swift.Hashable {}
