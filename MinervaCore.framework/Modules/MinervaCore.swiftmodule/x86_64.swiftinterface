@@ -17,15 +17,6 @@ public protocol BasePaymentRequest {
   var cancelUrl: Swift.String { get }
   var returnUrl: Swift.String { get }
 }
-public class PaymentRequest {
-  public var orderId: Swift.String
-  public var orderCode: Swift.String
-  public var amount: Swift.Double
-  public var orderDescription: Swift.String
-  public var expireTime: Swift.Int
-  public init(orderId: Swift.String, orderCode: Swift.String, orderDescription: Swift.String = "", amount: Swift.Double, expireTime: Swift.Int = 600)
-  @objc deinit
-}
 public class MinervaGatewayConfig {
   final public let clientCode: Swift.String
   final public let terminalCode: Swift.String
